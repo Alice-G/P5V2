@@ -2,86 +2,59 @@
 
 // BUG FIXME LEG BLOCK HINT TODO DEL
 
-let catalog = [];
-//HINT it has to be done INSIDE the function or it doesn't work. I don't know what to do with it.
-const fetchCatalog = function () {
-  fetch('http://localhost:3000/api/products')
-    .then(function (res) {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then(function (value) {
-      catalog = value;
-      // array catalog
-      console.log(catalog);
-      // each item in catalog
-      // for (let article of catalog) {
-      //   console.log(article);
-      // }
-    })
-    .catch(function (err) {
-      // Une erreur est survenue
-      console.log("fetch didn't work");
-    });
-};
+//BLOCK HOME PAGE
 
-const catalogDisplay = async () => {
-  await fetchCatalog();
+const apiURL = 'http://localhost:3000/api/products';
 
-  // DEL to be sure I'm actually selecting the right things
-  document.getElementById('items').style.border = '1px dashed purple';
+async function getCatalog() {
+  //storing response
+  let response = await fetch(apiURL); // stars a GET request (default)
+  // Storing data in form of JSON
+  const catalog = await response.json();
+  console.log(catalog); //DEL
+  console.log(typeof catalog); //DEL
+  if (response) {
+    displayCatalog(catalog);
+  }
+}
+//calling async function
+getCatalog();
 
-  document.getElementById('items').innerHTML = catalog.map((furniture) => {
-    `<a href="" id="card${furniture._id}">
-    <article>
-    <img src="${furniture._id.imageUrl}" alt="${furniture._id.altTxt}" />
-    <h3 class="productName">${furniture.name}</h3>
-    <p class="productDescription">${furniture.description}</p>
-    </article>
-    </a>
-    `;
-  });
-};
+// function to define innerHTML
+function displayCatalog(catalog) {
+  // let tab = '<div class="boop" style="border: 1px dashed purple">'; //container of things
+  //Loop to access all rows
 
-// DEL ANOTHER attempt ANOTHER way to do it
+  // HINT
 
-// We can now pass this data to a function that will render it into the HTML.
-async function displayCocktail(data) {
-  await fetchCatalog;
-  const canap = data[0];
-  const canapDiv = document.getElementById('items');
+  for (let item of catalog) {
+    let newDiv = document.createElement('div');
+    let newContent = `<a href="./product.html?id=${item._id}">
+      <article>
+        <img
+          src="${item.imageUrl}"
+          alt="${item.name} "
+        />
+        <h3 class="productName">${item.name}</h3>
+        <p class="productDescription">${item.description}</p>
+      </article>
+    </a>`;
 
-  // Now let’s output the data into our HTML starting with the cocktail name:
+    // HINT
+    newDiv.innerHTML = newContent;
 
-  const canapName = canap.name;
-  const heading = document.createElement('h1');
-  heading.innerHTML = canapName;
-  canapDiv.appendChild(heading);
-
-  // Next let’s get the image and also add it to the cocktail <div>. We’ll also use this image as the background for the <body>:
-
-  const cocktailImg = document.createElement('img');
-  cocktailImg.src = canap.imageUrl;
-  canapDiv.appendChild(cocktailImg);
-  document.body.style.backgroundImage = "url('" + canap.imageUrl + "')";
-  for (let article of catalog) {
-    displayCocktail(article);
+    //setting innerHTML as  tab
+    document.getElementById('items').appendChild(newDiv);
   }
 }
 
-/* <a href="./product.html?id=42">
-           <article>
-              <img src=".../product01.jpg" alt="Lorem ipsum dolor sit amet, Kanap name1"/>
-              <h3  class="productName">Kanap name1</h3>
-              <p class="productDescription"></p> */
+// TODO save url search param onclick?
 
-catalogDisplay();
+// BLOCK            PRODUCT PAGE
 
-// section class="items" id="items">
-// document.getElementById(“parent”).appendChild(document.createElement(“article”));
-
-// i think i fetched the json. maybe it's / because of what the API param say and later I'll need to add the prodcts
-// TODO run through it and store it
-// TODO find where to display it
-// TODO  display it
+// TODO use url search param to extract id
+// TODO if no id, default back to home page?
+// TODO store id
+// TODO take id into the fetch GET
+// TODO display stuff
+// TODO
