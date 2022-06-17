@@ -49,19 +49,103 @@ function displayProduct(item) {
   // populate the color options
   // TODO how do do colors?
 
-  let availableColors = `${item.colors}`;
-  console.log(availableColors); // DEL
+  let availableColors = item.colors;
+  //   console.log('availableColors: ', availableColors, typeof availableColors); // DEL
 
-  let colorSelector = document.querySelector('colors');
+  let colorSelector = document.getElementById('colors');
   let select = document.querySelector('select');
-  console.log(select); // DEL
+  //   console.log(select); // DEL
 
-  for (let i = 0; i < availableColors.length; i++) {
-    let option = document.createElement('option');
-    option.text = availableColors[i];
-    option.value = availableColors[i];
-    if (option) {
-      colorSelector.add(option);
+  let option;
+  for (let color of availableColors) {
+    option = document.createElement('option');
+    option.text = color;
+    option.value = color;
+    colorSelector.add(option);
+    // console.log('option created: ', option); // DEL
+  }
+  // because we'll need to get a param from here
+  // is this where the event handler goes???
+}
+
+// TODO make button click require a color. In this case, the value of 'select one' is empty. use that.
+// Allow it to work also if and only if number of articles is between 1 and 100
+
+const checkProduct = () => {
+  // validate color choice
+  var select = document.getElementById('colors');
+  let colorChoice = select.options[select.selectedIndex].value;
+  if (colorChoice == '') {
+    alert("N'oubliez pas de selectionner une couleur !");
+    // return false; // ASK what is this used for?
+  } else {
+    // console.log('this is the colorChoice: ', colorChoice); // DEL
+
+    // validate quantity at least one
+    let chosenQty = document.getElementById('quantity').value;
+    if (chosenQty < 1) {
+      alert('Il vous faut au moins un canapé à mettre dans le panier...');
+    } else if (chosenQty > 100) {
+      alert("Choisissez un numbre inférieur à 100, s'il vous plait.");
+    } else {
+      //   console.log('chosenQty now: ', chosenQty); // DEL
+      addBasket(colorChoice, chosenQty);
     }
   }
-}
+};
+
+const addBasket = (colorChoice, chosenQty) => {
+  // create an object for current product chosen, to add to the cart
+  let newAdd = { id: chosenProduct, color: colorChoice, count: chosenQty };
+
+  let products = [];
+  let product_exists = false;
+  // if there's something in basket
+  if (window.localStorage.getItem('products')) {
+    // console.log("something's in the basket"); // DEL
+    let products = JSON.parse(window.localStorage.getItem('products'));
+    // seeing if there's a match in what's stored
+    console.log(JSON.stringify(products).indexOf(JSON.stringify(newAdd)));
+    //check if a product exist in cart
+    console.log('products downloaded from local: ', products);
+
+    for (let loggedProduct of products) {
+      if (
+        loggedProduct.id === newAdd.id &&
+        loggedProduct.color === newAdd.color
+      ) {
+        product_exists = true;
+        // loggedProduct.count is a string. Work around to make it a number:
+        loggedProduct.count = parseInt(loggedProduct.count);
+        loggedProduct.count += 1;
+
+        // console.log('count after: ', loggedProduct.count); // DEL
+      }
+    }
+
+    if (product_exists) {
+      window.localStorage.setItem('products', JSON.stringify(products));
+    } else {
+      products.push(newAdd);
+      window.localStorage.setItem('products', JSON.stringify(products));
+      console.log('pushed new product');
+    }
+  } else {
+    // if there's nothing in basket
+    // console.log('the basket was empty'); // DEL
+    products.push(newAdd);
+    window.localStorage.setItem('products', JSON.stringify(products));
+  }
+
+  console.log('log of local storage at end: ', window.localStorage);
+  // TODO then ask 'continue shopping/go to cart'?
+  //is there html support?
+};
+
+// if validation is no go: preventDefault()?
+
+// select button
+let addToCartBtn = document.getElementById('addToCart');
+// console.log(addToCartBtn); // DEL
+// add event handler
+addToCartBtn.addEventListener('click', checkProduct);
