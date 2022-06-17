@@ -17,7 +17,6 @@ if (params.has('id')) {
 }
 
 // ASK if no id, default back to home page?
-// ASK should i try to create the elements and skip the divs?
 
 // use id to fill page.
 
@@ -67,9 +66,6 @@ function displayProduct(item) {
   // because we'll need to get a param from here
   // is this where the event handler goes???
 }
-
-// TODO make button click require a color. In this case, the value of 'select one' is empty. use that.
-// Allow it to work also if and only if number of articles is between 1 and 100
 
 const checkProduct = () => {
   // validate color choice
