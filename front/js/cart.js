@@ -20,7 +20,6 @@ getCatalog();
 
 function displayCart(item) {
   //              BLOCK Get info from local storage BLOCK
-
   console.log('display catalog: ', item);
 
   let products = [];
@@ -29,18 +28,15 @@ function displayCart(item) {
   if (window.localStorage.getItem('products')) {
     // console.log("something's in the basket"); // DEL
     let products = JSON.parse(window.localStorage.getItem('products'));
-    console.log('products downloaded from local: ', products);
+    console.log('products downloaded from local: ', products); // DEL
     product_exists = true;
-    // do a     if (product_exists) {} else {'there's nothing in cart}
 
     //              BLOCK Get info from target DOM BLOCK
-
     let cartContainer = document.getElementById('cart__items');
     console.log(cartContainer); // DEL this works
 
     for (let cartProduct of products) {
       // console.log('cartProduct', cartProduct); // DEL this works
-
       // FIXME my problem is using ID of cart to import catalog info
 
       // create article for each cartProduct
@@ -89,3 +85,142 @@ function displayCart(item) {
      </div>
    </div>
  </article> --> */
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+// TODO check url here?
+
+const urlKanap = 'http://localhost:3000/api/products/order';
+//Importation du localStorage
+let saveInLocalStorage = JSON.parse(localStorage.getItem('product'));
+//console.table(saveInLocalStorage);
+
+//Création d'un tableau pour le panier
+let productArray = [];
+const itemPosition = document.querySelector('#cart__items');
+
+//Récupèration des informations et affichage dans le panier
+//Quand le panier est vide
+if (saveInLocalStorage === null || saveInLocalStorage == 0) {
+  alert(
+    "Votre panier est vide. Allez sur la page d'accueil pour choisir vos articles !"
+  );
+  window.location.href = 'index.html';
+} else {
+  for (let product in saveInLocalStorage) {
+    //Ajout de l'élément "article" avec récupération de l'id
+    let productArticle = document.createElement('article');
+    productArticle.classList.add('cart__item');
+    productArticle.setAttribute(
+      'data-id',
+      '{saveInLocalStorage[product].productId}'
+    );
+    productArray.push(saveInLocalStorage[product].productId);
+
+    //Ajout des éléments HTML
+    productArticle.innerHTML = `<div class="cart__item__img">
+            <img src="${saveInLocalStorage[product].productImg}" alt="${saveInLocalStorage[product].productImg_alt}">
+            </div>
+          <div class="cart__item__content">
+            <div class="cart__item__content__titlePrice">
+                <h2>${saveInLocalStorage[product].productName} - ${saveInLocalStorage[product].productColors}</h2>
+                <p>${saveInLocalStorage[product].productPrice} €</p>
+            </div>
+            <div class="cart__item__content__settings">
+                <div class="cart__item__content__settings__quantity">
+                    <p>Qté : </p>
+                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${saveInLocalStorage[product].productQuantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                    <p class="deleteItem">Supprimer</p>
+                </div>
+            </div>
+          </div>`;
+    itemPosition.appendChild(productArticle);
+
+    updateCart(product);
+  }
+}
+
+changeQuantity();
+deleteProduct();
+
+//Mise à jour de la quantité totale du panier
+function updateCart(product) {
+  var itemQuantity = document.querySelectorAll('.itemQuantity');
+  //Déclare une variable qui récupère le nombre de produits différents dans le panier
+  var lengthQuantity = itemQuantity.length,
+    totalQuantity = 0;
+
+  //Ajoute la valeur pour chaque produit à la quantité totale
+  for (var i = 0; i < lengthQuantity; ++i) {
+    totalQuantity += itemQuantity[i].valueAsNumber;
+  }
+
+  //On implémente la quantité totale à l'élément HTML
+  let productTotalQuantity = document.querySelector('#totalQuantity');
+  productTotalQuantity.innerHTML = totalQuantity;
+  //console.log(totalQuantity);
+  totalPrice = 0;
+
+  //Calcul du total
+  for (var i = 0; i < lengthQuantity; ++i) {
+    totalPrice +=
+      itemQuantity[i].valueAsNumber * saveInLocalStorage[i].productPrice;
+  }
+
+  let productTotalPrice = document.querySelector('#totalPrice');
+  productTotalPrice.innerHTML = totalPrice;
+  //console.log(totalPrice);
+}
+
+//Mise à jour du panier quand on modifie la quantité pour chaque produit
+function changeQuantity() {
+  let itemQuantity = document.getElementsByClassName('itemQuantity');
+  //console.log(itemQuantity);
+
+  for (let q = 0; q < itemQuantity.length; q++) {
+    let changeQuantity = itemQuantity[q];
+    //Mise à jour au moment de changer la valeur de l'input
+    changeQuantity.addEventListener('input', (event) => {
+      itemQuantity.innerHTML += `<input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" 
+            value="${event.target.value}">`;
+
+      saveInLocalStorage[q].productQuantity = Number(changeQuantity.value);
+
+      localStorage.setItem('product', JSON.stringify(saveInLocalStorage));
+
+      updateCart(q);
+    });
+  }
+}
+
+//Suppression d'un produit du panier grâce au bouton
+function deleteProduct() {
+  let btn_delete = document.querySelectorAll('.deleteItem');
+  //console.log(btn_delete);
+
+  for (let i = 0; i < btn_delete.length; i++) {
+    let deleteOne = btn_delete[i];
+
+    //Ecoute du bouton "Supprimer"
+    deleteOne.addEventListener('click', (event) => {
+      saveInLocalStorage.splice(i, 1);
+      localStorage.setItem('product', JSON.stringify(saveInLocalStorage));
+      alert('Ce produit a bien été supprimé du panier.');
+      window.location.reload();
+    });
+  }
+}

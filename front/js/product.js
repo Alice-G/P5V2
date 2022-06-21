@@ -45,15 +45,10 @@ function displayProduct(item) {
   document.getElementById('price').innerHTML = `${item.price}`;
   // product description
   document.getElementById('description').innerHTML = `${item.description}`;
-  // populate the color options
-  // TODO how do do colors?
 
   let availableColors = item.colors;
-  //   console.log('availableColors: ', availableColors, typeof availableColors); // DEL
-
   let colorSelector = document.getElementById('colors');
-  let select = document.querySelector('select');
-  //   console.log(select); // DEL
+  // let select = document.querySelector('select'); // DEL never used
 
   let option;
   for (let color of availableColors) {
@@ -61,10 +56,7 @@ function displayProduct(item) {
     option.text = color;
     option.value = color;
     colorSelector.add(option);
-    // console.log('option created: ', option); // DEL
   }
-  // because we'll need to get a param from here
-  // is this where the event handler goes???
 }
 
 const checkProduct = () => {
@@ -73,7 +65,6 @@ const checkProduct = () => {
   let colorChoice = select.options[select.selectedIndex].value;
   if (colorChoice == '') {
     alert("N'oubliez pas de selectionner une couleur !");
-    // return false; // ASK what is this used for?
   } else {
     // console.log('this is the colorChoice: ', colorChoice); // DEL
 
@@ -81,10 +72,11 @@ const checkProduct = () => {
     let chosenQty = document.getElementById('quantity').value;
     if (chosenQty < 1) {
       alert('Il vous faut au moins un canapé à mettre dans le panier...');
-    } else if (chosenQty > 100) {
-      alert("Choisissez un numbre inférieur à 100, s'il vous plait.");
+      // } else if (chosenQty > 100) {
+      //   alert("Choisissez un numbre inférieur à 100, s'il vous plait.");
     } else {
       //   console.log('chosenQty now: ', chosenQty); // DEL
+
       addBasket(colorChoice, chosenQty);
     }
   }
@@ -96,52 +88,169 @@ const addBasket = (colorChoice, chosenQty) => {
 
   let products = [];
   let product_exists = false;
-  // if there's something in basket
+  // if there's something in basket BLOCK 1
   if (window.localStorage.getItem('products')) {
-    // console.log("something's in the basket"); // DEL
-    let products = JSON.parse(window.localStorage.getItem('products'));
-    // seeing if there's a match in what's stored
-    console.log(JSON.stringify(products).indexOf(JSON.stringify(newAdd)));
-    //check if a product exist in cart
-    console.log('products downloaded from local: ', products);
+    console.log("block 1, something's in the basket"); // DEL
 
+    // is new add the same than pdct already logged
+    let products = JSON.parse(window.localStorage.getItem('products'));
+    console.log(JSON.stringify(products).indexOf(JSON.stringify(newAdd))); //DEL or TODO comment out
+
+    console.log('products downloaded from local: ', products); // DEL
+
+    // BLOCK 5
     for (let loggedProduct of products) {
       if (
         loggedProduct.id === newAdd.id &&
         loggedProduct.color === newAdd.color
       ) {
+        console.log('block 5, checking if things in basket are same');
+        // the new log is the same as a product in the basket
         product_exists = true;
-        // loggedProduct.count is a string. Work around to make it a number:
+        // loggedProduct.count newAdd.count are strings. Work around to make them a number:
         loggedProduct.count = parseInt(loggedProduct.count);
-        loggedProduct.count += 1;
+        newAdd.count = parseInt(newAdd.count);
+
+        // if new pdct qty + local qty > 100 BLOCK 6
+        if (loggedProduct.count + parseInt(newAdd.count) > 100) {
+          // BLOCK 7
+
+          console.log(
+            'block 7, something in the basket, same in basket, total count over 100'
+          ); // DEL
+          alert(`:(
+Vous ne pouvez pas commander plus de 100 produits identiques.`);
+          // do I need to return false or return here?
+        } else {
+          // BLOCK 8
+          // new pdct qty + local qty <= 100
+          console.log(
+            'block 8, something in the basket, same in basket, total count ok'
+          ); //DEL
+          loggedProduct.count = loggedProduct.count + newAdd.count;
+
+          console.log(
+            'loggedProduct.count count after block 8',
+            loggedProduct.count
+          );
+
+          // push of new pdt quantity TODO
+          // products.push(newAdd); // not it, right???
+          window.localStorage.setItem('products', JSON.stringify(products)); // is this it??? TEST
+          console.log('pushed new qty mybe?'); // DEL
+
+          // go to cart or stay?
+          if (
+            window.confirm(`Cliquez sur OK pour voir votre panier.
+          Pour continuer vos achats, appuyez sur 'Cancel'.`)
+          ) {
+            // window.location.href = '../html/cart.html'; // TODO TOGGLE
+            console.log('redirect'); // DEL
+          } else {
+            // do nothing and stay on page
+            // TODO make it reload?
+            console.log('no redirect'); // DEL
+            return false;
+          }
+        }
 
         // console.log('count after: ', loggedProduct.count); // DEL
+      } else {
+        console.log('block 9, product in basket is different');
+        // TODO is qty of new add over 100? BLOCK 9 TEST
+        if (newAdd.count > 100) {
+          // TODO if yes alert and stop function BLOCK 10
+          console.log(
+            'block 10, the quantity is over 100, type of newAdd.count: ',
+            newAdd.count,
+            typeof newAdd.count
+          );
+          alert(`:(
+Vous ne pouvez pas commander plus de 100 produits identiques.`);
+          // do i need return here? I don't think so cause it's an 'end'? TODO TEST
+        } else {
+          // if no log + go/stay BLOCK 11
+          console.log('block 11, quantity is ok');
+          console.log(
+            'type of newAdd.count: ',
+            newAdd.count,
+            typeof newAdd.count
+          );
+
+          // push of new pdt
+          products.push(newAdd);
+          window.localStorage.setItem('products', JSON.stringify(products)); // is this it??? TEST
+          console.log('block 11, pushed new product maybe?'); // DEL
+          // FIXME here it adds but logs on different lines in local
+
+          // go to cart or stay?
+          if (
+            window.confirm(`Cliquez sur OK pour voir votre panier.
+          Pour continuer vos achats, appuyez sur 'Cancel'.`)
+          ) {
+            // window.location.href = '../html/cart.html'; // TODO TOGGLE
+            console.log('redirect'); // DEL
+          } else {
+            // do nothing and stay on page
+            // TODO make it reload?
+            console.log('no redirect'); // DEL
+            // return false; // IS THIS THE PROBLEM???
+            return; // try this??? TRY TEST
+          }
+          return;
+        }
+        return;
       }
+      return;
     }
 
-    if (product_exists) {
-      window.localStorage.setItem('products', JSON.stringify(products));
+    // BLOCK 2
+  } else {
+    // there's nothing in basket
+    // console.log('the basket was empty'); // DEL
+
+    // if new pdct qty + local qty > 100 BLOCK 2
+    console.log(
+      'block 2, the basket was empty, newAdd.count: ',
+      newAdd.count,
+      typeof newAdd.count
+    ); // DEL here it's a string
+    if (parseInt(newAdd.count) > 100) {
+      // BLOCK 3
+      console.log('block 3, newAdd.count: ', newAdd.count, typeof newAdd.count); // DEL is string
+      console.log('block 3, basket was empty, quantity over 100'); // DEL TODO
+      alert(`:(
+Vous ne pouvez pas commander plus de 100 produits identiques.`);
+      // do I need return here? TEST
     } else {
+      // BLOCK 4
+      console.log('block 4, basket was empty, quantity ok'); //DEL
+      // loggedProduct.count += 1; // do I need that? no, because there was no 'same in basket, right? DEL
+
+      // log into local storage
       products.push(newAdd);
       window.localStorage.setItem('products', JSON.stringify(products));
-      console.log('pushed new product');
+      console.log('pushed new product'); // DEL
+
+      // go to cart or stay?
+      if (
+        window.confirm(`Cliquez sur OK pour voir votre panier.
+      Pour continuer vos achats, appuyez sur 'Cancel'.`)
+      ) {
+        // window.location.href = '../html/cart.html'; // TODO TOGGLE
+        console.log('redirect'); // DEL
+      } else {
+        // do nothing and stay on page
+        // TODO make it reload?
+        console.log('no redirect'); // DEL
+        return false;
+      }
     }
-  } else {
-    // if there's nothing in basket
-    // console.log('the basket was empty'); // DEL
-    products.push(newAdd);
-    window.localStorage.setItem('products', JSON.stringify(products));
   }
 
-  console.log('log of local storage at end: ', window.localStorage);
-  // TODO then ask 'continue shopping/go to cart'?
-  //is there html support?
+  console.log('log of local storage at end: ', window.localStorage); //DEL
 };
-
-// if validation is no go: preventDefault()?
 
 // select button
 let addToCartBtn = document.getElementById('addToCart');
-// console.log(addToCartBtn); // DEL
-// add event handler
 addToCartBtn.addEventListener('click', checkProduct);
