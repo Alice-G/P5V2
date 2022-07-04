@@ -2,225 +2,296 @@
 
 // BUG FIXME LEG BLOCK HINT TODO DEL TEST ASK
 
-// ASK Do I create an 'empty' message of 'Vous n'avez pas de produits dans votre panier'?
-
 //                      BLOCK Get info from api BLOCK
 
 const apiCatalog = `http://localhost:3000/api/products/`;
+const apiOrderUrl = `http://localhost:3000/api/products/order`;
 
-async function getCatalog() {
-  let response = await fetch(apiCatalog);
-  const productData = await response.json();
-  if (response) {
-    displayCart(productData);
-  }
-}
-//calling async function
-getCatalog();
+// async function getCatalog() {
+//   let response = await fetch(apiCatalog);
+//   const productData = await response.json();
+//   if (response) {
+//     displayCart(productData);
+//     let catalog = productData;
+//     console.log('catalog: ', catalog, typeof catalog); // this works DEL ASK this is object no array is it normal?
+//   }
+// }
+// //calling async function
+// getCatalog();
 
-function displayCart(item) {
-  //              BLOCK Get info from local storage BLOCK
-  console.log('display catalog: ', item);
+let productsInLocal = JSON.parse(window.localStorage.getItem('products')); //BLOCK A
+console.log('products downloaded from local: ', productsInLocal); // DEL
 
-  let products = [];
-  let product_exists = false;
-  // if there's something in local
-  if (window.localStorage.getItem('products')) {
-    // console.log("something's in the basket"); // DEL
-    let products = JSON.parse(window.localStorage.getItem('products'));
-    console.log('products downloaded from local: ', products); // DEL
-    product_exists = true;
-
-    //              BLOCK Get info from target DOM BLOCK
-    let cartContainer = document.getElementById('cart__items');
-    console.log(cartContainer); // DEL this works
-
-    for (let cartProduct of products) {
-      // console.log('cartProduct', cartProduct); // DEL this works
-      // FIXME my problem is using ID of cart to import catalog info
-
-      // create article for each cartProduct
-      let displayedCartProduct = document.createElement('div');
-      displayedCartProduct.classList.add('cart__item');
-      displayedCartProduct.innerHTML = `<data-id="${item.id}" data-color="${item.color}>" style="border:1px dashed red;"`; // FIXME
-      cartContainer.appendChild(displayedCartProduct);
-      // product pic
-      let newImgContainer = document.createElement('div');
-      newImgContainer.innerHTML = `<img src="${item.imageUrl}" alt="${item.altTxt}" style="border:1px dashed green;"/>`; // FIXME TODO image undefined etc
-      displayedCartProduct.appendChild(newImgContainer);
-
-      // -  <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
-      // <div class="cart__item__img">
-      //   <img src="../images/product01.jpg" alt="Photographie d'un canapé">
-      // </div>
-    }
-  } else {
-    alert('Your basket is empty'); // TODO TEST
-    // product_exists stays false DEL TEST
-    console.log(product_exists); // TEST DEL
-  }
+let product_exists = false;
+if (window.localStorage.getItem('products')) {
+  product_exists = true;
 }
 
-//                              HINT HTML to create HINT
-
-/* <section id="cart__items">
-<!--  <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
-   <div class="cart__item__img">
-     <img src="../images/product01.jpg" alt="Photographie d'un canapé">
-   </div>
-   <div class="cart__item__content">
-     <div class="cart__item__content__description">
-       <h2>Nom du produit</h2>
-       <p>Vert</p>
-       <p>42,00 €</p>
-     </div>
-     <div class="cart__item__content__settings">
-       <div class="cart__item__content__settings__quantity">
-         <p>Qté : </p>
-         <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
-       </div>
-       <div class="cart__item__content__settings__delete">
-         <p class="deleteItem">Supprimer</p>
-       </div>
-     </div>
-   </div>
- </article> --> */
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-//                  BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-
-// TODO check url here?
-
-const urlKanap = 'http://localhost:3000/api/products/order';
-//Importation du localStorage
-let saveInLocalStorage = JSON.parse(localStorage.getItem('product'));
-//console.table(saveInLocalStorage);
-
-//Création d'un tableau pour le panier
-let productArray = [];
-const itemPosition = document.querySelector('#cart__items');
+let productsInCart = []; //ASK what is this for??????
 
 //Récupèration des informations et affichage dans le panier
 //Quand le panier est vide
-if (saveInLocalStorage === null || saveInLocalStorage == 0) {
+if ((product_exists = false)) {
   alert(
-    "Votre panier est vide. Allez sur la page d'accueil pour choisir vos articles !"
+    `Votre panier est vide. 
+'OK' pour retourner sur la page d'accueil.
+'Cancel' pour rester ici.`
   );
-  window.location.href = 'index.html';
+  window.location.href = 'index.html'; // TEST
 } else {
-  for (let product in saveInLocalStorage) {
-    //Ajout de l'élément "article" avec récupération de l'id
-    let productArticle = document.createElement('article');
-    productArticle.classList.add('cart__item');
-    productArticle.setAttribute(
+  displayCart(productsInLocal);
+}
+
+function displayCart() {
+  // HINT catalog is defined here
+
+  //                DISPLAY OF ELEMENTS
+  for (let localProduct in productsInLocal) {
+    // productsInCart.push(productsInLocal[localProduct].id); //ASK what is this for??????
+
+    // create a card for each product
+    let productCard = document.createElement('article');
+    productCard.classList.add('cart__item');
+    productCard.setAttribute(
       'data-id',
-      '{saveInLocalStorage[product].productId}'
+      `${productsInLocal[localProduct].id}`,
+      'data-color',
+      `${productsInLocal[localProduct].color}`
     );
-    productArray.push(saveInLocalStorage[product].productId);
+    document.getElementById('cart__items').appendChild(productCard);
 
-    //Ajout des éléments HTML
-    productArticle.innerHTML = `<div class="cart__item__img">
-            <img src="${saveInLocalStorage[product].productImg}" alt="${saveInLocalStorage[product].productImg_alt}">
-            </div>
-          <div class="cart__item__content">
-            <div class="cart__item__content__titlePrice">
-                <h2>${saveInLocalStorage[product].productName} - ${saveInLocalStorage[product].productColors}</h2>
-                <p>${saveInLocalStorage[product].productPrice} €</p>
-            </div>
-            <div class="cart__item__content__settings">
-                <div class="cart__item__content__settings__quantity">
-                    <p>Qté : </p>
-                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${saveInLocalStorage[product].productQuantity}">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                    <p class="deleteItem">Supprimer</p>
-                </div>
-            </div>
-          </div>`;
-    itemPosition.appendChild(productArticle);
+    // create innerHTML
+    let cartItemImg = document.createElement('div');
+    cartItemImg.classList.add('cart__item__img');
 
-    updateCart(product);
+    productCard.innerHTML = `<div class="cart__item__img">
+    <img src="${productsInLocal[localProduct].pdctImg}" alt="${productsInLocal[localProduct].altTxt}">
+    </div>
+  <div class="cart__item__content">
+    <div class="cart__item__content__titlePrice">
+        <h2>${productsInLocal[localProduct].pdctName} - ${productsInLocal[localProduct].color}</h2>
+        <p>${productsInLocal[localProduct].pdctPrice} €</p>
+    </div>
+    <div class="cart__item__content__settings">
+        <div class="cart__item__content__settings__quantity">
+            <p>Qté : </p>
+            <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${productsInLocal[localProduct].count}">
+            </div>
+            <div class="cart__item__content__settings__delete">
+            <p class="deleteItem">Supprimer</p>
+        </div>
+    </div>
+  </div>`;
+    updateCart(localProduct);
   }
 }
 
-changeQuantity();
-deleteProduct();
+changeQty();
+deletePdct();
 
-//Mise à jour de la quantité totale du panier
-function updateCart(product) {
-  var itemQuantity = document.querySelectorAll('.itemQuantity');
-  //Déclare une variable qui récupère le nombre de produits différents dans le panier
-  var lengthQuantity = itemQuantity.length,
-    totalQuantity = 0;
+// Update cart total quantity //TEST
+function updateCart(localProduct) {
+  let itemQty = document.querySelectorAll('.itemQuantity');
+  //How many products are in cart?
+  let lengthQty = itemQty.length,
+    totalQty = 0;
+  console.log('lengthQty: ', lengthQty); // FIXME the count isn't correct here
 
-  //Ajoute la valeur pour chaque produit à la quantité totale
-  for (var i = 0; i < lengthQuantity; ++i) {
-    totalQuantity += itemQuantity[i].valueAsNumber;
+  // because it's called in each for each loop, we don't have to add up the lines
+
+  // Add up each different product
+  for (var i = 0; i < lengthQty; ++i) {
+    totalQty += itemQty[i].valueAsNumber;
+    // console.log('lengthQty: ', lengthQty); // DEL
+    // console.log('lengthQty: ', lengthQty); // DEL
+    // console.log('itemQty: ', itemQty); // DEL
   }
 
   //On implémente la quantité totale à l'élément HTML
-  let productTotalQuantity = document.querySelector('#totalQuantity');
-  productTotalQuantity.innerHTML = totalQuantity;
-  //console.log(totalQuantity);
-  totalPrice = 0;
+  let pdctTotalQty = document.querySelector('#totalQuantity');
+  pdctTotalQty.innerHTML = totalQty;
+  // console.log('totalQty: ', totalQty); // DEL this works
+  let totalPrice = 0;
+  // console.log('totalPrice(+type): ', totalPrice, typeof totalPrice); // DEL this works
 
   //Calcul du total
-  for (var i = 0; i < lengthQuantity; ++i) {
-    totalPrice +=
-      itemQuantity[i].valueAsNumber * saveInLocalStorage[i].productPrice;
+  for (i = 0; i < lengthQty; ++i) {
+    totalPrice += itemQty[i].valueAsNumber * productsInLocal[i].pdctPrice;
+    // console.log('totalPrice in calcul du total: ', totalPrice); // DEL this works
   }
 
-  let productTotalPrice = document.querySelector('#totalPrice');
-  productTotalPrice.innerHTML = totalPrice;
-  //console.log(totalPrice);
+  let pdctTotalPrice = document.querySelector('#totalPrice');
+  pdctTotalPrice.innerHTML = totalPrice;
 }
 
-//Mise à jour du panier quand on modifie la quantité pour chaque produit
-function changeQuantity() {
-  let itemQuantity = document.getElementsByClassName('itemQuantity');
-  //console.log(itemQuantity);
+// //Mise à jour du panier quand on modifie la quantité pour chaque produit
+// FIXME ASK how the hell do you modify quantity? with +/-?? can't see the option. With
+function changeQty() {
+  let itemQty = document.getElementsByClassName('itemQuantity'); // this is the field, not the value
+  console.log('itemQty.length: ', itemQty.length);
 
-  for (let q = 0; q < itemQuantity.length; q++) {
-    let changeQuantity = itemQuantity[q];
+  for (let q = 0; q < itemQty.length; q++) {
+    let changeQty = itemQty[q];
     //Mise à jour au moment de changer la valeur de l'input
-    changeQuantity.addEventListener('input', (event) => {
-      itemQuantity.innerHTML += `<input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" 
-            value="${event.target.value}">`;
+    changeQty.addEventListener('input', function (event) {
+      itemQty.innerHTML += `<input type="number" class="itemQty" name="itemQty" min="1" max="100"
+            value="${event.target.value}">`; // this is what sends updated product count to "Total"
 
-      saveInLocalStorage[q].productQuantity = Number(changeQuantity.value);
-
-      localStorage.setItem('product', JSON.stringify(saveInLocalStorage));
+      productsInLocal[q].count = Number(changeQty.value); // this is what sends updated product count to localStorage
+      localStorage.setItem('products', JSON.stringify(productsInLocal));
 
       updateCart(q);
     });
   }
 }
 
-//Suppression d'un produit du panier grâce au bouton
-function deleteProduct() {
-  let btn_delete = document.querySelectorAll('.deleteItem');
-  //console.log(btn_delete);
+// use of "Supprimer" btn
+function deletePdct() {
+  let deleteBtn = document.querySelectorAll('.deleteItem');
+  console.log('deleteBtn: ', deleteBtn);
 
-  for (let i = 0; i < btn_delete.length; i++) {
-    let deleteOne = btn_delete[i];
+  for (let i = 0; i < deleteBtn.length; i++) {
+    let deleteOne = deleteBtn[i];
 
-    //Ecoute du bouton "Supprimer"
-    deleteOne.addEventListener('click', (event) => {
-      saveInLocalStorage.splice(i, 1);
-      localStorage.setItem('product', JSON.stringify(saveInLocalStorage));
+    console.log('productsInLocal pre delete: ', productsInLocal);
+
+    // "Supprimer" btn listener
+    deleteOne.addEventListener('click', () => {
+      productsInLocal.splice(i, 1);
+      console.log('productsInLocal after delete: ', productsInLocal);
+      localStorage.setItem('products', JSON.stringify(productsInLocal));
       alert('Ce produit a bien été supprimé du panier.');
       window.location.reload();
     });
   }
 }
+
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
+
+//    FORM VALIDATION
+
+// regex for email and name
+let regEmail = /^([a-z\d\.-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/;
+// var regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g; // also found this: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/
+// var regName = /\d+$/g;
+// let regName = /^[A-Za-z]+$/;
+// let regName = /\d+\w/;
+let regName = /^[a-z\d]{2,12}$/; // min 2 characters, max 12 // do I need to specify - included here? how does test work? FIXME
+
+let orderBtn = document.getElementById('order');
+orderBtn.addEventListener('click', function () {
+  // if fields are empty
+  if (
+    document.getElementById('firstName').value == '' ||
+    regName.test(document.getElementById('firstName').value)
+  ) {
+    document.getElementById(
+      'firstNameErrorMsg'
+    ).innerHTML = `Veuillez entrer votre nom correctement.`;
+    return false;
+  }
+  // if (document.getElementById('lastName').value == '') {
+  //   console.log('last name empty');
+  //   document.getElementById(
+  //     'lastNameErrorMsg'
+  //   ).innerHTML = `Ce champ ne peut pas rester vide.`;
+  //   return false;
+  // }
+  // if (document.getElementById('address').value == '') {
+  //   console.log('last name empty');
+  //   document.getElementById(
+  //     'addressErrorMsg'
+  //   ).innerHTML = `Vous devez renseigner votre adresse.`;
+  //   return false;
+  // }
+  // if (document.getElementById('city').value == '') {
+  //   console.log('oops');
+  //   document.getElementById(
+  //     'cityErrorMsg'
+  //   ).innerHTML = `Vous devez renseigner votre adresse.`;
+  //   return false;
+  // }
+  // if (document.getElementById('email').value == '') {
+  //   console.log('no email');
+  //   document.getElementById(
+  //     'emailErrorMsg'
+  //   ).innerHTML = `Nous avons besoin de votre adresse mail.`;
+  //   return false;
+  // }
+});
+
+// Form validation code will come here.
+// function validateForm() {
+//   if (document.formblock.firstName.value == '') {
+//     alert('Please provide your name!');
+// document.myForm.Name.focus();
+// return false;
+// }
+// if (document.myForm.EMail.value == '') {
+//   alert('Please provide your Email!');
+//   document.myForm.EMail.focus();
+//   return false;
+// }
+// if (
+//   document.myForm.Zip.value == '' ||
+//   isNaN(document.myForm.Zip.value) ||
+//   document.myForm.Zip.value.length != 5
+// ) {
+//   alert('Please provide a zip in the format #####.');
+//   document.myForm.Zip.focus();
+//   return false;
+// }
+// if (document.myForm.Country.value == '-1') {
+//   alert('Please provide your country!');
+//   return false;
+// }
+// return true;
+// }
+
+// BLOCK BLOCK BLOCK BLOCK
+/* <div class="cart__order">
+<form method="get" class="cart__order__form">
+  <div class="cart__order__form__question">
+    <label for="firstName">Prénom: </label>
+    <input type="text" name="firstName" id="firstName" required>
+    <p id="firstNameErrorMsg"><!-- ci est un message d'erreur --></p>
+  </div>
+  <div class="cart__order__form__question">
+    <label for="lastName">Nom: </label>
+    <input type="text" name="lastName" id="lastName" required>
+    <p id="lastNameErrorMsg"></p>
+  </div>
+  <div class="cart__order__form__question">
+    <label for="address">Adresse: </label>
+    <input type="text" name="address" id="address" required>
+    <p id="addressErrorMsg"></p>
+  </div>
+  <div class="cart__order__form__question">
+    <label for="city">Ville: </label>
+    <input type="text" name="city" id="city" required>
+    <p id="cityErrorMsg"></p>
+  </div>
+  <div class="cart__order__form__question">
+    <label for="email">Email: </label>
+    <input type="email" name="email" id="email" required>
+    <p id="emailErrorMsg"></p>
+  </div>
+  <div class="cart__order__form__submit">
+    <input type="submit" value="Commander !" id="order">
+  </div>
+</form>
+</div> */

@@ -57,6 +57,18 @@ function displayProduct(item) {
     option.value = color;
     colorSelector.add(option);
   }
+
+  // sending loaded product info to local storage for use in addBasket
+
+  let pdctName = item.name;
+  let pdctPrice = item.price;
+  let pdctImg = item.imageUrl;
+  let altTxt = item.altTxt;
+  console.log('pdct Name in display: ', pdctName);
+
+  let throwToHeap = [pdctName, pdctPrice, pdctImg, altTxt];
+
+  window.localStorage.setItem('throwToHeap', JSON.stringify(throwToHeap));
 }
 
 const checkProduct = () => {
@@ -83,8 +95,20 @@ const checkProduct = () => {
 };
 
 const addBasket = (colorChoice, chosenQty) => {
+  let thrownToLocal = JSON.parse(localStorage.getItem('throwToHeap'));
+  console.log('thrownToLocal: ', thrownToLocal); // DEL
+
   // create an object for current product chosen, to add to the cart
-  let newAdd = { id: chosenProduct, color: colorChoice, count: chosenQty };
+  let newAdd = {
+    id: chosenProduct,
+    color: colorChoice,
+    count: chosenQty,
+    pdctName: thrownToLocal[0],
+    pdctPrice: thrownToLocal[1],
+    pdctImg: thrownToLocal[2],
+    altTxt: thrownToLocal[3],
+  };
+  console.log('newAdd: ', newAdd); //DEL
 
   let products = [];
   let product_exists = false;
@@ -94,9 +118,38 @@ const addBasket = (colorChoice, chosenQty) => {
 
     // is new add the same than pdct already logged
     let products = JSON.parse(window.localStorage.getItem('products'));
-    console.log(JSON.stringify(products).indexOf(JSON.stringify(newAdd))); //DEL or TODO comment out
+    // console.log(JSON.stringify(products).indexOf(JSON.stringify(newAdd))); // comment out
 
     console.log('products downloaded from local: ', products); // DEL
+
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME
+    // FIXME FIXME FIXME This is the block who branches out wrong when there's a NEW new product added and WHY??????
 
     // BLOCK 5
     for (let loggedProduct of products) {
@@ -105,6 +158,16 @@ const addBasket = (colorChoice, chosenQty) => {
         loggedProduct.color === newAdd.color
       ) {
         console.log('block 5, checking if things in basket are same');
+        console.log(
+          'block 5, loggedProduct: ',
+          loggedProduct,
+          'loggedProduct.id: ',
+          loggedProduct.id,
+          'newAdd: ',
+          newAdd,
+          'newAdd.id: ',
+          newAdd.id
+        );
         // the new log is the same as a product in the basket
         product_exists = true;
         // loggedProduct.count newAdd.count are strings. Work around to make them a number:
@@ -131,7 +194,9 @@ Vous ne pouvez pas commander plus de 100 produits identiques.`);
 
           console.log(
             'loggedProduct.count count after block 8',
-            loggedProduct.count
+            loggedProduct.count,
+            'type: ',
+            typeof loggedProduct.count
           );
 
           // push of new pdt quantity TODO
