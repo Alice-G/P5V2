@@ -20,7 +20,7 @@ const apiOrderUrl = `http://localhost:3000/api/products/order`;
 // getCatalog();
 
 let productsInLocal = JSON.parse(window.localStorage.getItem('products')); //BLOCK A
-console.log('products downloaded from local: ', productsInLocal); // DEL
+// console.log('products downloaded from local: ', productsInLocal); // DEL
 
 let product_exists = false;
 if (window.localStorage.getItem('products')) {
@@ -95,7 +95,7 @@ function updateCart(localProduct) {
   //How many products are in cart?
   let lengthQty = itemQty.length,
     totalQty = 0;
-  console.log('lengthQty: ', lengthQty); // FIXME the count isn't correct here
+  // console.log('lengthQty: ', lengthQty); // FIXME the count isn't correct here
 
   // because it's called in each for each loop, we don't have to add up the lines
 
@@ -128,7 +128,7 @@ function updateCart(localProduct) {
 // FIXME ASK how the hell do you modify quantity? with +/-?? can't see the option. With
 function changeQty() {
   let itemQty = document.getElementsByClassName('itemQuantity'); // this is the field, not the value
-  console.log('itemQty.length: ', itemQty.length);
+  // console.log('itemQty.length: ', itemQty.length); // DEL
 
   for (let q = 0; q < itemQty.length; q++) {
     let changeQty = itemQty[q];
@@ -148,12 +148,11 @@ function changeQty() {
 // use of "Supprimer" btn
 function deletePdct() {
   let deleteBtn = document.querySelectorAll('.deleteItem');
-  console.log('deleteBtn: ', deleteBtn);
 
   for (let i = 0; i < deleteBtn.length; i++) {
     let deleteOne = deleteBtn[i];
 
-    console.log('productsInLocal pre delete: ', productsInLocal);
+    // console.log('productsInLocal pre delete: ', productsInLocal); // DEL
 
     // "Supprimer" btn listener
     deleteOne.addEventListener('click', () => {
@@ -182,57 +181,102 @@ function deletePdct() {
 // BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
 // BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
 
-//    FORM VALIDATION
+//                         FORM VALIDATION
+// form fields selection
+let form = document.querySelector('.cart__order__form');
 
-// regex for email and name
-let regEmail = /^([a-z\d\.-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/;
+let firstName = document.getElementById('firstName');
+let firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
+
+let lastName = document.getElementById('lastName');
+let lastNameErrorMsg = document.getElementById('lastNameErrorMsg');
+
+let address = document.getElementById('address');
+let addressErrorMsg = document.getElementById('addressErrorMsg');
+
+let city = document.getElementById('city');
+let cityErrorMsg = document.getElementById('cityErrorMsg');
+
+let email = document.getElementById('email');
+let emailErrorMsg = document.getElementById('emailErrorMsg');
+
+// regExs
+// let regName = '/^[a-z]{2,12}$/'; // min 2 characters, max 12 // do I need to specify - included here? how does test work? FIXME add possibility for - or '. authorizes numbers???
+let regName = "/^(?:[A-z ]|[-|'](?=[A-z]))*[-']?$/";
+// HINT my reg ex to include "-", "'" but not double uses, and " "??
+
+// let regAddress =; // TODO
+
+// let regCity
+
+let regEmail = '/^([a-zd.-]+)@([a-zd-]+).([a-z]{2,8})(.[a-z]{2,8})?$/';
 // var regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g; // also found this: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/
-// var regName = /\d+$/g;
-// let regName = /^[A-Za-z]+$/;
-// let regName = /\d+\w/;
-let regName = /^[a-z\d]{2,12}$/; // min 2 characters, max 12 // do I need to specify - included here? how does test work? FIXME
+// ASK ASK ASK ASK ASK what kind of reg ex for other fields?
 
-let orderBtn = document.getElementById('order');
-orderBtn.addEventListener('click', function () {
-  // if fields are empty
-  if (
-    document.getElementById('firstName').value == '' ||
-    regName.test(document.getElementById('firstName').value)
-  ) {
-    document.getElementById(
-      'firstNameErrorMsg'
-    ).innerHTML = `Veuillez entrer votre nom correctement.`;
-    return false;
+function emptyFormCheck() {
+  //   // // if fields are empty
+  //   if (firstName.value == '') {
+  //     firstNameErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
+  //     return false; // ASK do I need those?
+  //   }
+  // }
+  // if (lastName.value == '') {
+  //   lastNameErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
+  //   return false;
+  // }
+  // if (address.value == '') {
+  //   addressErrorMsg.innerHTML = `Veuillez entrer votre adresse.`;
+  //   return false;
+  // }
+  // if (city.value == '') {
+  //   cityErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
+  //   return false;
+  // }
+  // if (email.value == '') {
+  //   emailErrorMsg.innerHTML = `Nous avons besoin de votre adresse mail.`;
+  //   return false;
+  // }
+}
+// FIXME the alerts don't go away
+
+// errors
+// firstName.addEventListener('change', (Event) => {
+//   if (regName.test(firstName.value)) {
+//     console.log('first name invalid');
+//     firstNameErrorMsg.innerHTML = `Veuillez entrer votre Prénom correctement.`;
+//     // return false;
+//   }
+// });
+email.addEventListener('change', (Event) => {
+  if (regEmail.test(email.value)) {
+    console.log('first name invalid');
+    emailErrorMsg.innerHTML = `Veuillez entrer votre Prénom correctement.`;
+    // return false;
   }
-  // if (document.getElementById('lastName').value == '') {
-  //   console.log('last name empty');
-  //   document.getElementById(
-  //     'lastNameErrorMsg'
-  //   ).innerHTML = `Ce champ ne peut pas rester vide.`;
-  //   return false;
-  // }
-  // if (document.getElementById('address').value == '') {
-  //   console.log('last name empty');
-  //   document.getElementById(
-  //     'addressErrorMsg'
-  //   ).innerHTML = `Vous devez renseigner votre adresse.`;
-  //   return false;
-  // }
-  // if (document.getElementById('city').value == '') {
-  //   console.log('oops');
-  //   document.getElementById(
-  //     'cityErrorMsg'
-  //   ).innerHTML = `Vous devez renseigner votre adresse.`;
-  //   return false;
-  // }
-  // if (document.getElementById('email').value == '') {
-  //   console.log('no email');
-  //   document.getElementById(
-  //     'emailErrorMsg'
-  //   ).innerHTML = `Nous avons besoin de votre adresse mail.`;
-  //   return false;
-  // }
 });
+
+// if (regName.test(lastName.value)) {
+//   console.log('last name invalid');
+//   lastNameErrorMsg.innerHTML = `Veuillez entrer votre nom correctement.`;
+//   // return false;
+// }
+// if (regAddress.test(address.value)) {
+//   console.log('addressinvalid');
+//   addressErrorMsg.innerHTML = `Veuillez entrer une adressse valide.`;
+// }
+// if (regCity.test(city.value)) {
+//   console.log('city invalid');
+//   cityErrorMsg.innerHTML = `Ceci n'est pas un nom de ville valide.`;
+// }
+// if (regEmail.test(email.value)) {
+//   console.log('email invalid');
+//   emailErrorMsg.innerHTML = `Ceci n'est pas un email valide.`;
+// }
+// console.log("It's all good!");
+
+// trigger form validation when click
+let orderBtn = document.getElementById('order');
+orderBtn.addEventListener('click', emptyFormCheck);
 
 // Form validation code will come here.
 // function validateForm() {
@@ -261,37 +305,3 @@ orderBtn.addEventListener('click', function () {
 // }
 // return true;
 // }
-
-// BLOCK BLOCK BLOCK BLOCK
-/* <div class="cart__order">
-<form method="get" class="cart__order__form">
-  <div class="cart__order__form__question">
-    <label for="firstName">Prénom: </label>
-    <input type="text" name="firstName" id="firstName" required>
-    <p id="firstNameErrorMsg"><!-- ci est un message d'erreur --></p>
-  </div>
-  <div class="cart__order__form__question">
-    <label for="lastName">Nom: </label>
-    <input type="text" name="lastName" id="lastName" required>
-    <p id="lastNameErrorMsg"></p>
-  </div>
-  <div class="cart__order__form__question">
-    <label for="address">Adresse: </label>
-    <input type="text" name="address" id="address" required>
-    <p id="addressErrorMsg"></p>
-  </div>
-  <div class="cart__order__form__question">
-    <label for="city">Ville: </label>
-    <input type="text" name="city" id="city" required>
-    <p id="cityErrorMsg"></p>
-  </div>
-  <div class="cart__order__form__question">
-    <label for="email">Email: </label>
-    <input type="email" name="email" id="email" required>
-    <p id="emailErrorMsg"></p>
-  </div>
-  <div class="cart__order__form__submit">
-    <input type="submit" value="Commander !" id="order">
-  </div>
-</form>
-</div> */
