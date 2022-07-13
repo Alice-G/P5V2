@@ -153,15 +153,8 @@ const addBasket = (colorChoice, chosenQty) => {
         loggedProduct.color === newAdd.color
       ) {
         productExists = true;
-        // everything from here on is stupid
-        // console.log('for loop engaged');
-        // existingPdct = loggedProduct;
-        // console.log('existingPdct log in for loop: ', existingPdct); // DEL
-        // HINT HINT HINT HINT HINT HINT HINT HINT HINT HINT HINT HINT HINT
-        // FIXME do i use this to make loggedProduct exist outside loop
-        // do I use .find()
-        // do I try to make productExists the similar logged product here?
-        // console.log('productExist is true'); // DEL
+        // i use this to make loggedProduct exist outside loop
+        existingPdct = loggedProduct;
       }
     }
 

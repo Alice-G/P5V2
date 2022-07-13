@@ -200,108 +200,132 @@ let cityErrorMsg = document.getElementById('cityErrorMsg');
 let email = document.getElementById('email');
 let emailErrorMsg = document.getElementById('emailErrorMsg');
 
+let orderBtn = document.getElementById('order');
+console.log('orderBtn: ', orderBtn);
+
 // regExs
-// let regName = '/^[a-z]{2,12}$/'; // min 2 characters, max 12 // do I need to specify - included here? how does test work? FIXME add possibility for - or '. authorizes numbers???
-let regName = "/^(?:[A-z ]|[-|'](?=[A-z]))*[-']?$/";
-// HINT my reg ex to include "-", "'" but not double uses, and " "??
+let regName = new RegExp("^(?:[A-zÀ-ÿ ]|[-|'](?=[A-z]))*[-']?$"); // allows letters, "-", "'" but not double uses, and " "
+let regAddress = new RegExp(
+  "/^(?:[A-zÀ-ÿ0-9 ,]{10,}|[-|'](?=[A-z]))*[-',]?$/gm"
+); // allows numbers, letters, "-", "'" but not double uses, and " "
+//FIXME it doesn't work with commas
+let regCity = regName;
+let regEmail = new RegExp(
+  '/^([a-zd.-]+)@([a-zd-]+).([a-z]{2,8})(.[a-z]{2,8})?$/'
+); // imposes use of @ somewhere and a domain
 
-// let regAddress =; // TODO
-
-// let regCity
-
-let regEmail = '/^([a-zd.-]+)@([a-zd-]+).([a-z]{2,8})(.[a-z]{2,8})?$/';
-// var regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g; // also found this: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/
-// ASK ASK ASK ASK ASK what kind of reg ex for other fields?
-
-function emptyFormCheck() {
-  //   // // if fields are empty
-  //   if (firstName.value == '') {
-  //     firstNameErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
-  //     return false; // ASK do I need those?
-  //   }
-  // }
-  // if (lastName.value == '') {
-  //   lastNameErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
-  //   return false;
-  // }
-  // if (address.value == '') {
-  //   addressErrorMsg.innerHTML = `Veuillez entrer votre adresse.`;
-  //   return false;
-  // }
-  // if (city.value == '') {
-  //   cityErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
-  //   return false;
-  // }
-  // if (email.value == '') {
-  //   emailErrorMsg.innerHTML = `Nous avons besoin de votre adresse mail.`;
-  //   return false;
-  // }
-}
-// FIXME the alerts don't go away
-
-// errors
-// firstName.addEventListener('change', (Event) => {
-//   if (regName.test(firstName.value)) {
-//     console.log('first name invalid');
-//     firstNameErrorMsg.innerHTML = `Veuillez entrer votre Prénom correctement.`;
-//     // return false;
-//   }
-// });
-email.addEventListener('change', (Event) => {
-  if (regEmail.test(email.value)) {
-    console.log('first name invalid');
-    emailErrorMsg.innerHTML = `Veuillez entrer votre Prénom correctement.`;
-    // return false;
+// validation functions
+function validateFirstName() {
+  // do i need to set a 'is false' at the start or do i need to return false in this? TEST
+  if (!firstName.value || regName.test(firstName.value) == false) {
+    console.log('first name invalid'); // DEL
+    firstNameErrorMsg.innerHTML = `Veuillez entrer votre Prénom correctement.`;
+    firstName.focus();
+    return false;
+  } else {
+    firstNameErrorMsg.innerHTML = ``;
+    return true;
   }
+}
+
+function validateLastName() {
+  if (!lastName.value || regName.test(lastName.value) == false) {
+    console.log('last name invalid');
+    lastNameErrorMsg.innerHTML = `Veuillez entrer un nom valide.`;
+    lastName.focus();
+  } else {
+    lastNameErrorMsg.innerHTML = ``;
+    return true;
+  }
+}
+
+function validateAddress() {
+  if (!address.value || regAddress.test(address.value) == false) {
+    console.log('address invalid');
+    addressErrorMsg.innerHTML = `Ceci n'est pas une addresse valide.`;
+    address.focus();
+  } else {
+    addressErrorMsg.innerHTML = ``;
+    return true;
+  }
+}
+
+function validateCity() {
+  if (!city.value || regCity.test(city.value) == false) {
+    console.log('first name invalid');
+    cityErrorMsg.innerHTML = `Ceci n'est pas une addresse valide.`;
+    city.focus();
+    // return false; // ???
+  } else {
+    cityErrorMsg.innerHTML = ``;
+    return true;
+  }
+}
+
+function validateEmail() {
+  if (!email.value || regEmail.test(email.value) == false) {
+    console.log('first name invalid');
+    emailErrorMsg.innerHTML = `Ceci n'est pas un email valide.`;
+    email.focus();
+    // return false;
+  } else {
+    emailErrorMsg.innerHTML = ``;
+    return true;
+  }
+}
+
+// because form fields have 'required', there is no need to check if they are empty on submit
+
+function validateForm() {
+  validateFirstName();
+  validateLastName();
+  validateAddress();
+  validateCity();
+  validateEmail();
+  console.log('val first name', validateFirstName());
+  console.log('val last name', validateLastName());
+  console.log('val address', validateAddress());
+  console.log('val city', validateCity());
+  console.log('val email', validateEmail());
+
+  if (
+    validateFirstName() &&
+    validateLastName() &&
+    validateAddress() &&
+    validateCity() &&
+    validateEmail() === true
+  ) {
+    console.log('good to go!');
+    // this is where shit happens
+    // log everything in POST
+    // clear local
+    // reload?
+    // change window.location?
+    // alert?
+  } else {
+    console.log('nope'); // DEL this whole else after
+  }
+}
+
+orderBtn.addEventListener('click', function (e) {
+  // prevent the form from submitting
+  // e.preventDefault();
+  validateForm(); // HINT do i need the () here?
 });
 
-// if (regName.test(lastName.value)) {
-//   console.log('last name invalid');
-//   lastNameErrorMsg.innerHTML = `Veuillez entrer votre nom correctement.`;
-//   // return false;
-// }
-// if (regAddress.test(address.value)) {
-//   console.log('addressinvalid');
-//   addressErrorMsg.innerHTML = `Veuillez entrer une adressse valide.`;
-// }
-// if (regCity.test(city.value)) {
-//   console.log('city invalid');
-//   cityErrorMsg.innerHTML = `Ceci n'est pas un nom de ville valide.`;
-// }
-// if (regEmail.test(email.value)) {
-//   console.log('email invalid');
-//   emailErrorMsg.innerHTML = `Ceci n'est pas un email valide.`;
-// }
-// console.log("It's all good!");
+// form.addEventListener('submit', function (e) {
+//   // prevent the form from submitting
+//   e.preventDefault();
+//   validateForm; // HINT do i need the () here?
+// });
 
-// trigger form validation when click
-let orderBtn = document.getElementById('order');
-orderBtn.addEventListener('click', emptyFormCheck);
+//Invalide le bouton d'envoi et enable le quant tous les champs seront correctement renseignés. "Change" y a peut être mieux du coup comme event à écouter.
 
-// Form validation code will come here.
-// function validateForm() {
-//   if (document.formblock.firstName.value == '') {
-//     alert('Please provide your name!');
-// document.myForm.Name.focus();
-// return false;
-// }
-// if (document.myForm.EMail.value == '') {
-//   alert('Please provide your Email!');
-//   document.myForm.EMail.focus();
-//   return false;
-// }
-// if (
-//   document.myForm.Zip.value == '' ||
-//   isNaN(document.myForm.Zip.value) ||
-//   document.myForm.Zip.value.length != 5
-// ) {
-//   alert('Please provide a zip in the format #####.');
-//   document.myForm.Zip.focus();
-//   return false;
-// }
-// if (document.myForm.Country.value == '-1') {
-//   alert('Please provide your country!');
-//   return false;
-// }
-// return true;
-// }
+// at first try of validation, no reaction at all.
+
+// errors
+let orderStatus; // FIXME I don't know how to do this
+
+// orderBtn.preventDefault();
+
+console.log('orderStatus: ', orderStatus);

@@ -40,6 +40,35 @@ firstName.addEventListener('change', (Event) => {
   }
 });
 
+// let regName = '/^[a-z]{2,12}$/'; // min 2 characters, max 12 // do I need to specify - included here? how does test work? FIXME add possibility for - or '. authorizes numbers???
+// var regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g; // also found this: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/
+
+function emptyFormCheck() {
+  //   // // if fields are empty
+  //   if (firstName.value == '') {
+  //     firstNameErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
+  //     return false; // ASK do I need those?
+  //   }
+  // }
+  // if (lastName.value == '') {
+  //   lastNameErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
+  //   return false;
+  // }
+  // if (address.value == '') {
+  //   addressErrorMsg.innerHTML = `Veuillez entrer votre adresse.`;
+  //   return false;
+  // }
+  // if (city.value == '') {
+  //   cityErrorMsg.innerHTML = `Ce champ ne peut pas rester vide.`;
+  //   return false;
+  // }
+  // if (email.value == '') {
+  //   emailErrorMsg.innerHTML = `Nous avons besoin de votre adresse mail.`;
+  //   return false;
+  // }
+}
+// FIXME the alerts don't go away
+
 //     // go to cart or stay?
 //     if (
 //       window.confirm(`Cliquez sur OK pour voir votre panier.
@@ -125,3 +154,45 @@ firstName.addEventListener('change', (Event) => {
 // }
 
 // }
+
+// BLOCK BLOCK BLOCK BLOCK BLOCK
+
+function validateName() {
+  if (!firstname.value) {
+    error_name.innerHTML = `<p>Por favor, insira um nome!</p>`;
+  } else {
+    error_name.innerHTML = ``;
+    return true;
+  }
+}
+
+// maybe functions call one another?
+
+function validateCity() {
+  if (!city.value) {
+    error_city.innerHTML = `<p>Por favor, selecione uma cidadde.</p>`;
+  } else {
+    error_city.innerHTML = ``;
+    return true;
+  }
+}
+
+function validate() {
+  validateName();
+  validatePassword1();
+  validatePassword2();
+  validateChecked();
+  console.log(validateName());
+  console.log(validatePassword());
+  console.log(validateCity());
+
+  if (validateName() && validatePassword() && validateCity() === true) {
+    btn.style.display = 'flex';
+  }
+}
+
+btn.onclick = function submit() {
+  window.alert('Registro concluido com sucesso');
+  window.reload();
+  return true;
+};
