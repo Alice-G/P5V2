@@ -11,9 +11,9 @@ let params = new URLSearchParams(idParam);
 let chosenProduct;
 if (params.has('id')) {
   chosenProduct = params.get('id');
+} else {
+  window.location.href = '../html/index.html';
 }
-
-// ASK if no id, default back to home page?
 
 // use id to fill page.
 const apiProductURL = `http://localhost:3000/api/products/${chosenProduct}`;
@@ -68,12 +68,11 @@ const goOrStay = () => {
     window.confirm(`Cliquez sur OK pour voir votre panier.
   Pour continuer vos achats, appuyez sur 'Cancel'.`)
   ) {
-    // window.location.href = '../html/cart.html'; // TODO TOGGLE
-    console.log('redirect'); // DEL
+    window.location.href = '../html/cart.html';
+    // console.log('redirect');
   } else {
     // do nothing and stay on page
-    // TODO make it reload?
-    console.log('no redirect'); // DEL
+    // console.log('no redirect');
     return false;
   }
 };
@@ -94,8 +93,7 @@ function checkProduct() {
     alert(`:(
 Vous ne pouvez pas commander plus de 100 produits identiques.`);
   } else {
-    // verification came out ok =>
-    // console.log('verif was ok, on to addBasket'); // DEL
+    // verification came out ok ->
     addBasket(colorChoice, chosenQty);
   }
 }
@@ -120,7 +118,7 @@ const addBasket = (colorChoice, chosenQty) => {
   };
   // boolean variables to simplify code
   let productsInCart = false;
-  let productExists = false; // HINT could be defined later on if needed?
+  let productExists = false;
 
   // START OF POSSIBILITIES TREE
   // is there something in the cart?
@@ -130,7 +128,7 @@ const addBasket = (colorChoice, chosenQty) => {
 
   if (!productsInCart) {
     // cart is empty
-    console.log('nothing in cart'); // DEL
+    // console.log('nothing in cart array');
 
     // push new product to cart array
     products.push(newAdd);
@@ -140,7 +138,7 @@ const addBasket = (colorChoice, chosenQty) => {
     goOrStay();
   } else {
     // cart isn't empty
-    console.log('products are in cart'); //DEL
+    // console.log('there are products in cart array');
 
     // import of cart array
     products = JSON.parse(window.localStorage.getItem('products'));
@@ -160,11 +158,12 @@ const addBasket = (colorChoice, chosenQty) => {
 
     if (!productExists) {
       // new clicked product isn't the same as the one(s) already in the cart
-      console.log("the product isn't the same as previous one");
+      // console.log("the product isn't the same as previous one");
+
       // push of new product
       products.push(newAdd);
       window.localStorage.setItem('products', JSON.stringify(products)); //
-      console.log('pushed new product'); // DEL
+      // console.log('pushed new product');
 
       goOrStay();
     } else {
@@ -183,20 +182,16 @@ const addBasket = (colorChoice, chosenQty) => {
         alert(`:(
       Vous ne pouvez pas commander plus de 100 produits identiques.`);
       } else {
-        console.log('added up quantity is acceptable');
-        // update quantity of existing product, keep other products TODO TODO TODO TODO TEST TEST TEST TEST
-        // TODO how the fuck??? I don't know how to do that if I have gotten out of the for loop
+        // console.log('added up quantity is acceptable');
+        // update quantity of existing product, keep other products
+        window.localStorage.setItem('products', JSON.stringify(products));
+        console.log('pushed new qty');
 
-        window.localStorage.setItem('products', JSON.stringify(products)); // is this it??? TEST
-        console.log('pushed new qty'); // DEL
-
-        console.table('products: ', products);
-        console.log('go or stay');
         goOrStay();
       }
     }
   }
-  console.log('log of local storage at end: ', window.localStorage); //DEL
+  // console.log('log of local storage at end: ', window.localStorage);
 };
 
 // select button

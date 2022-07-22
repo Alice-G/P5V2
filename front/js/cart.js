@@ -1,54 +1,29 @@
 'use strict';
 
-// BUG FIXME LEG BLOCK HINT TODO DEL TEST ASK
-
-//                      BLOCK Get info from api BLOCK
-
-const apiCatalog = `http://localhost:3000/api/products/`;
-const apiOrderUrl = `http://localhost:3000/api/products/order`;
-
-// async function getCatalog() {
-//   let response = await fetch(apiCatalog);
-//   const productData = await response.json();
-//   if (response) {
-//     displayCart(productData);
-//     let catalog = productData;
-//     console.log('catalog: ', catalog, typeof catalog); // this works DEL ASK this is object no array is it normal?
-//   }
-// }
-// //calling async function
-// getCatalog();
-
-let productsInLocal = JSON.parse(window.localStorage.getItem('products')); //BLOCK A
-// console.log('products downloaded from local: ', productsInLocal); // DEL
+let productsInLocal = JSON.parse(window.localStorage.getItem('products'));
+// console.log('products downloaded from local: ', productsInLocal);
 
 let product_exists = false;
 if (window.localStorage.getItem('products')) {
   product_exists = true;
 }
 
-let productsInCart = []; //ASK what is this for??????
-
 //Récupèration des informations et affichage dans le panier
 //Quand le panier est vide
-if ((product_exists = false)) {
-  alert(
+if (!product_exists) {
+  confirm(
     `Votre panier est vide. 
 'OK' pour retourner sur la page d'accueil.
 'Cancel' pour rester ici.`
   );
-  window.location.href = 'index.html'; // TEST
+  window.location.href = 'index.html';
 } else {
   displayCart(productsInLocal);
 }
 
 function displayCart() {
-  // HINT catalog is defined here
-
   //                DISPLAY OF ELEMENTS
   for (let localProduct in productsInLocal) {
-    // productsInCart.push(productsInLocal[localProduct].id); //ASK what is this for??????
-
     // create a card for each product
     let productCard = document.createElement('article');
     productCard.classList.add('cart__item');
@@ -89,70 +64,94 @@ function displayCart() {
 changeQty();
 deletePdct();
 
-// Update cart total quantity //TEST
+// Update cart total quantity
 function updateCart(localProduct) {
   let itemQty = document.querySelectorAll('.itemQuantity');
-  //How many products are in cart?
+  //How many different products (id/color combo) are in cart?
   let lengthQty = itemQty.length,
     totalQty = 0;
-  // console.log('lengthQty: ', lengthQty); // FIXME the count isn't correct here
-
   // because it's called in each for each loop, we don't have to add up the lines
 
   // Add up each different product
   for (var i = 0; i < lengthQty; ++i) {
     totalQty += itemQty[i].valueAsNumber;
-    // console.log('lengthQty: ', lengthQty); // DEL
-    // console.log('lengthQty: ', lengthQty); // DEL
-    // console.log('itemQty: ', itemQty); // DEL
   }
 
-  //On implémente la quantité totale à l'élément HTML
+  // Total Qty display
   let pdctTotalQty = document.querySelector('#totalQuantity');
   pdctTotalQty.innerHTML = totalQty;
-  // console.log('totalQty: ', totalQty); // DEL this works
   let totalPrice = 0;
-  // console.log('totalPrice(+type): ', totalPrice, typeof totalPrice); // DEL this works
 
-  //Calcul du total
+  // Total Price display
   for (i = 0; i < lengthQty; ++i) {
     totalPrice += itemQty[i].valueAsNumber * productsInLocal[i].pdctPrice;
-    // console.log('totalPrice in calcul du total: ', totalPrice); // DEL this works
   }
 
   let pdctTotalPrice = document.querySelector('#totalPrice');
   pdctTotalPrice.innerHTML = totalPrice;
 }
 
-// //Mise à jour du panier quand on modifie la quantité pour chaque produit
-// FIXME ASK how the hell do you modify quantity? with +/-?? can't see the option. With
+// live check & update pdct qty
 function changeQty() {
   let itemQty = document.getElementsByClassName('itemQuantity'); // this is the field, not the value
-  // console.log('itemQty.length: ', itemQty.length); // DEL
 
+  // for each line (each of the different products)
   for (let q = 0; q < itemQty.length; q++) {
     let changeQty = itemQty[q];
-    //Mise à jour au moment de changer la valeur de l'input
-    changeQty.addEventListener('input', function (event) {
-      itemQty.innerHTML += `<input type="number" class="itemQty" name="itemQty" min="1" max="100"
-            value="${event.target.value}">`; // this is what sends updated product count to "Total"
 
-      productsInLocal[q].count = Number(changeQty.value); // this is what sends updated product count to localStorage
-      localStorage.setItem('products', JSON.stringify(productsInLocal));
+    // regex to only allow integers
+    let regInt = new RegExp('[^0-9]');
 
-      updateCart(q);
+    // listen to change of input value
+    changeQty.addEventListener('change', function (event) {
+      console.log('changeQty.value: ', changeQty.value);
+      // new qty > 100?
+      if (changeQty.value > 100) {
+        console.log('not allowed');
+        alert(`:(
+Vous ne pouvez pas commander plus de 100 produits identiques.`);
+        // force return to previous valid value
+        changeQty.value = productsInLocal[q].count;
+
+        // new qty < 1
+      } else if (changeQty.value < 1) {
+        // console.log('not allowed');
+        alert(`:(
+Vous ne pouvez pas commander moins de 1 produit identiques.`);
+        // force return to previous valid value
+        changeQty.value = productsInLocal[q].count;
+
+        // new qty = integer ?
+      } else if (regInt.test(changeQty.value) == true) {
+        // console.log('not an integer');
+
+        alert(`:(
+Vous ne pouvez pas commander moins de 1 produit identiques.`);
+        // force return to previous valid value
+        changeQty.value = productsInLocal[q].count;
+
+        // if number is accepted
+      } else {
+        // console.log('allowed');
+        let newProposedQty = changeQty.value;
+
+        itemQty.innerHTML += `<input type="number" class="itemQty" name="itemQty" min="1" max="100"
+              value="${event.target.value}">`; // this is what sends updated product count to "Total"
+
+        productsInLocal[q].count = Number(newProposedQty); // this is what sends updated product count to localStorage
+        localStorage.setItem('products', JSON.stringify(productsInLocal));
+        updateCart(q);
+      }
     });
   }
 }
 
-// use of "Supprimer" btn
+// use of delete btn
 function deletePdct() {
   let deleteBtn = document.querySelectorAll('.deleteItem');
 
   for (let i = 0; i < deleteBtn.length; i++) {
     let deleteOne = deleteBtn[i];
-
-    // console.log('productsInLocal pre delete: ', productsInLocal); // DEL
 
     // "Supprimer" btn listener
     deleteOne.addEventListener('click', () => {
@@ -164,22 +163,6 @@ function deletePdct() {
     });
   }
 }
-
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
-// BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK BLOCK
 
 //                         FORM VALIDATION
 // form fields selection
@@ -201,50 +184,52 @@ let email = document.getElementById('email');
 let emailErrorMsg = document.getElementById('emailErrorMsg');
 
 let orderBtn = document.getElementById('order');
-console.log('orderBtn: ', orderBtn);
 
 // regExs
-let regName = new RegExp("^(?:[A-zÀ-ÿ ]|[-|'](?=[A-z]))*[-']?$"); // allows letters, "-", "'" but not double uses, and " "
-let regAddress = new RegExp(
-  "/^(?:[A-zÀ-ÿ0-9 ,]{10,}|[-|'](?=[A-z]))*[-',]?$/gm"
-); // allows numbers, letters, "-", "'" but not double uses, and " "
-//FIXME it doesn't work with commas
+let regName = new RegExp("^(?:[A-zÀ-ÿ ]|[-|'](?=[A-z]))*[-']?$");
+// allows letters, "-", "'" but not double uses, and " "
+
+let regAddress = /^(?!.*([ ,'-])\1)([a-zÀ-ÿ0-9 ,'-]){10,}$/i;
+// allows numbers, letters, "-", "'", "," but not double uses, and " "
 let regCity = regName;
-let regEmail = new RegExp(
-  '/^([a-zd.-]+)@([a-zd-]+).([a-z]{2,8})(.[a-z]{2,8})?$/'
-); // imposes use of @ somewhere and a domain
+let regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+// imposes use of @ somewhere and a domain
 
 // validation functions
 function validateFirstName() {
-  // do i need to set a 'is false' at the start or do i need to return false in this? TEST
   if (!firstName.value || regName.test(firstName.value) == false) {
-    console.log('first name invalid'); // DEL
+    // console.log('first name invalid');
     firstNameErrorMsg.innerHTML = `Veuillez entrer votre Prénom correctement.`;
     firstName.focus();
     return false;
   } else {
     firstNameErrorMsg.innerHTML = ``;
+    // console.log('first name is valid');
     return true;
   }
 }
 
 function validateLastName() {
   if (!lastName.value || regName.test(lastName.value) == false) {
-    console.log('last name invalid');
+    // console.log('last name invalid');
     lastNameErrorMsg.innerHTML = `Veuillez entrer un nom valide.`;
     lastName.focus();
+    return false;
   } else {
     lastNameErrorMsg.innerHTML = ``;
+    // console.log('last name is valid');
     return true;
   }
 }
 
 function validateAddress() {
   if (!address.value || regAddress.test(address.value) == false) {
-    console.log('address invalid');
-    addressErrorMsg.innerHTML = `Ceci n'est pas une addresse valide.`;
+    // console.log('address invalid');
+    addressErrorMsg.innerHTML = `Ceci n'est pas une adresse valide.`;
     address.focus();
+    return false;
   } else {
+    // console.log('address valide');
     addressErrorMsg.innerHTML = ``;
     return true;
   }
@@ -252,24 +237,26 @@ function validateAddress() {
 
 function validateCity() {
   if (!city.value || regCity.test(city.value) == false) {
-    console.log('first name invalid');
+    // console.log('city invalid');
     cityErrorMsg.innerHTML = `Ceci n'est pas une addresse valide.`;
     city.focus();
-    // return false; // ???
+    return false; // ???
   } else {
     cityErrorMsg.innerHTML = ``;
+    // console.log('city is valid');
     return true;
   }
 }
 
 function validateEmail() {
   if (!email.value || regEmail.test(email.value) == false) {
-    console.log('first name invalid');
+    // console.log('email invalid');
     emailErrorMsg.innerHTML = `Ceci n'est pas un email valide.`;
     email.focus();
-    // return false;
+    return false;
   } else {
     emailErrorMsg.innerHTML = ``;
+    // console.log('email is valid');
     return true;
   }
 }
@@ -277,17 +264,14 @@ function validateEmail() {
 // because form fields have 'required', there is no need to check if they are empty on submit
 
 function validateForm() {
-  validateFirstName();
-  validateLastName();
-  validateAddress();
-  validateCity();
-  validateEmail();
-  console.log('val first name', validateFirstName());
-  console.log('val last name', validateLastName());
-  console.log('val address', validateAddress());
-  console.log('val city', validateCity());
-  console.log('val email', validateEmail());
+  // console.log('val first name: ', validateFirstName());
+  // console.log('val last name', validateLastName());
+  // console.log('val address', validateAddress());
+  // console.log('val city', validateCity());
+  // console.log('val email', validateEmail());
+  // (this is used to test whether the bollean testing works, but caution: it doesn't matter much here, but this notation means they are also called while the log is done)
 
+  // no need to call funtions before because they'll be called in the check
   if (
     validateFirstName() &&
     validateLastName() &&
@@ -295,37 +279,56 @@ function validateForm() {
     validateCity() &&
     validateEmail() === true
   ) {
-    console.log('good to go!');
-    // this is where shit happens
-    // log everything in POST
-    // clear local
-    // reload?
-    // change window.location?
-    // alert?
-  } else {
-    console.log('nope'); // DEL this whole else after
+    // console.log('form validated,  placing order');
+    placeOrder();
   }
 }
 
 orderBtn.addEventListener('click', function (e) {
   // prevent the form from submitting
-  // e.preventDefault();
-  validateForm(); // HINT do i need the () here?
+  e.preventDefault();
+  validateForm();
 });
 
-// form.addEventListener('submit', function (e) {
-//   // prevent the form from submitting
-//   e.preventDefault();
-//   validateForm; // HINT do i need the () here?
-// });
+function placeOrder() {
+  if (!productsInLocal) {
+    alert('Il vous faut des produits à commander.');
+    // will not be used unless the empty cart check is removed
+  } else {
+    let orderedPdcts = [];
+    for (let i = 0; i < productsInLocal.length; i++) {
+      orderedPdcts.push(productsInLocal[i].id);
+    }
 
-//Invalide le bouton d'envoi et enable le quant tous les champs seront correctement renseignés. "Change" y a peut être mieux du coup comme event à écouter.
+    const orderInfo = {
+      contact: {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        address: address.value,
+        city: city.value,
+        email: email.value,
+      },
+      products: orderedPdcts,
+    };
 
-// at first try of validation, no reaction at all.
+    // Requête POST sur l'API
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(orderInfo),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
 
-// errors
-let orderStatus; // FIXME I don't know how to do this
-
-// orderBtn.preventDefault();
-
-console.log('orderStatus: ', orderStatus);
+    fetch('http://localhost:3000/api/products/order', options)
+      .then((results) => results.json())
+      .then((data) => {
+        // add order ID to confirmation page url
+        document.location.href = 'confirmation.html?id=' + data.orderId;
+      })
+      .catch(function (error) {
+        console.log('Erreur fetch' + error);
+      });
+  }
+}
