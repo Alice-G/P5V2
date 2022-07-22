@@ -126,7 +126,7 @@ Vous ne pouvez pas commander moins de 1 produit identiques.`);
         // console.log('not an integer');
 
         alert(`:(
-Vous ne pouvez pas commander moins de 1 produit identiques.`);
+Vous ne pouvez commander que des canapés entiers. ;)`);
         // force return to previous valid value
         changeQty.value = productsInLocal[q].count;
 

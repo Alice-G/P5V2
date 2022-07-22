@@ -7,9 +7,8 @@ let productId = params.get('id');
 // Display id as order number
 let orderId = document.querySelector('#orderId');
 orderId.textContent = productId;
-console.log(localStorage);
+console.log('localStorage pre reset: ', localStorage);
 
 // Reset LocalStorage
 localStorage.removeItem('products');
-localStorage.removeItem('throwToHeap');
-console.log(localStorage);
+console.log('localStorage post rest:', localStorage);

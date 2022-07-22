@@ -1,8 +1,6 @@
 'use strict';
 
-// BUG FIXME LEG BLOCK HINT TODO DEL TEST ASK
-
-//                         DISPLAY PRODUCT INFO ON PAGE
+//           DISPLAY PRODUCT INFO ON PAGE
 
 // Get the id off of current page url
 let idParam = window.location.search;
@@ -28,7 +26,16 @@ async function getProduct() {
 //calling async function
 getProduct();
 
+// array to store current displayed pdct data
+let toHeap;
 function displayProduct(item) {
+  // sending loaded product info to local storage for use in addBasket
+  let pdctName = item.name;
+  let pdctPrice = item.price;
+  let pdctImg = item.imageUrl;
+  let altTxt = item.altTxt;
+  toHeap = [pdctName, pdctPrice, pdctImg, altTxt];
+
   //   product pic
   let newImgContainer = document.createElement('div');
   newImgContainer.innerHTML = `<img src="${item.imageUrl}" alt="${item.altTxt}"/>`;
@@ -50,17 +57,9 @@ function displayProduct(item) {
     option.value = color;
     colorSelector.add(option);
   }
-
-  //                MAKE BUTTON FUNCTIONAL W/ CHECKS & LOCAL STORAGE
-
-  // sending loaded product info to local storage for use in addBasket
-  let pdctName = item.name;
-  let pdctPrice = item.price;
-  let pdctImg = item.imageUrl;
-  let altTxt = item.altTxt;
-  let throwToHeap = [pdctName, pdctPrice, pdctImg, altTxt];
-  window.localStorage.setItem('throwToHeap', JSON.stringify(throwToHeap));
 }
+
+//      MAKE BUTTON FUNCTIONAL W/ CHECKS & REDIRECTION
 
 // function to call at the very end to give user choice to move on to cart page or stay on page
 const goOrStay = () => {
@@ -82,6 +81,9 @@ function checkProduct() {
   var select = document.getElementById('colors');
   let colorChoice = select.options[select.selectedIndex].value;
   let chosenQty = document.getElementById('quantity').value;
+  // regex to only allow integers
+  let regInt = new RegExp('[^0-9]');
+
   // validate color choice
   if (colorChoice == '') {
     alert("N'oubliez pas de selectionner une couleur !");
@@ -92,6 +94,10 @@ function checkProduct() {
     // validate quantity = no more than 100
     alert(`:(
 Vous ne pouvez pas commander plus de 100 produits identiques.`);
+  } else if (regInt.test(chosenQty) == true) {
+    // qty not an integer
+    alert(`:(
+Vous ne pouvez commander que des canapés entiers. :P`);
   } else {
     // verification came out ok ->
     addBasket(colorChoice, chosenQty);
@@ -103,18 +109,16 @@ let products = [];
 
 // last checks and add to cart
 const addBasket = (colorChoice, chosenQty) => {
-  // get product JSON info that was fetched and saved in LocalStorage
-  let recupFromHeap = JSON.parse(localStorage.getItem('throwToHeap'));
-
   // create an object for current product chosen, to add to the cart
+  console.log('toHeap: ', toHeap);
   let newAdd = {
     id: chosenProduct,
     color: colorChoice,
     count: chosenQty,
-    pdctName: recupFromHeap[0],
-    pdctPrice: recupFromHeap[1],
-    pdctImg: recupFromHeap[2],
-    altTxt: recupFromHeap[3],
+    pdctName: toHeap[0],
+    pdctPrice: toHeap[1],
+    pdctImg: toHeap[2],
+    altTxt: toHeap[3],
   };
   // boolean variables to simplify code
   let productsInCart = false;
