@@ -110,13 +110,13 @@ let products = [];
 // last checks and add to cart
 const addBasket = (colorChoice, chosenQty) => {
   // create an object for current product chosen, to add to the cart
-  console.log('toHeap: ', toHeap);
+  // console.log('toHeap: ', toHeap);
   let newAdd = {
     id: chosenProduct,
     color: colorChoice,
     count: chosenQty,
     pdctName: toHeap[0],
-    pdctPrice: toHeap[1],
+    // pdctPrice: toHeap[1],
     pdctImg: toHeap[2],
     altTxt: toHeap[3],
   };

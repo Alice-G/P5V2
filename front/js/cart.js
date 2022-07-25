@@ -1,11 +1,39 @@
 'use strict';
 
+const apiURL = 'http://localhost:3000/api/products';
+
+// import from localStorage
 let productsInLocal = JSON.parse(window.localStorage.getItem('products'));
 // console.log('products downloaded from local: ', productsInLocal);
 
 let product_exists = false;
 if (window.localStorage.getItem('products')) {
   product_exists = true;
+}
+
+// import prices from API to complete
+async function getCompleteCart() {
+  // storing response
+  let response = await fetch(apiURL);
+  // Storing data in form of JSON
+  const catalog = await response.json();
+
+  // for
+  for (let localProduct of productsInLocal) {
+    for (let catalogItem of catalog) {
+      if (catalogItem._id === localProduct.id) {
+        localProduct.price = catalogItem.price;
+      }
+    }
+  }
+  return productsInLocal;
+}
+
+async function displayPage() {
+  const cart = await getCompleteCart();
+  displayCart(cart);
+  changeQty();
+  deletePdct();
 }
 
 //Récupèration des informations et affichage dans le panier
@@ -18,11 +46,11 @@ if (!product_exists) {
   );
   window.location.href = 'index.html';
 } else {
-  displayCart(productsInLocal);
+  displayPage();
 }
 
+//                DISPLAY OF ELEMENTS
 function displayCart() {
-  //                DISPLAY OF ELEMENTS
   for (let localProduct in productsInLocal) {
     // create a card for each product
     let productCard = document.createElement('article');
@@ -45,7 +73,7 @@ function displayCart() {
   <div class="cart__item__content">
     <div class="cart__item__content__titlePrice">
         <h2>${productsInLocal[localProduct].pdctName} - ${productsInLocal[localProduct].color}</h2>
-        <p>${productsInLocal[localProduct].pdctPrice} €</p>
+        <p>${productsInLocal[localProduct].price} €</p>
     </div>
     <div class="cart__item__content__settings">
         <div class="cart__item__content__settings__quantity">
@@ -60,9 +88,6 @@ function displayCart() {
     updateCart(localProduct);
   }
 }
-
-changeQty();
-deletePdct();
 
 // Update cart total quantity
 function updateCart(localProduct) {
@@ -84,7 +109,7 @@ function updateCart(localProduct) {
 
   // Total Price display
   for (i = 0; i < lengthQty; ++i) {
-    totalPrice += itemQty[i].valueAsNumber * productsInLocal[i].pdctPrice;
+    totalPrice += itemQty[i].valueAsNumber * productsInLocal[i].price;
   }
 
   let pdctTotalPrice = document.querySelector('#totalPrice');
